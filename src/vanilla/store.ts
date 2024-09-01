@@ -776,19 +776,21 @@ export const createStore = (): Store => {
   return buildStore(getAtomState)
 }
 
-let defaultStore: Store | undefined
+export const getDefaultStore = (() => {
+  let defaultStore: Store | undefined
 
-export const getDefaultStore = (): Store => {
-  if (!defaultStore) {
-    defaultStore = createStore()
-    if (import.meta.env?.MODE !== 'production') {
-      ;(globalThis as any).__JOTAI_DEFAULT_STORE__ ||= defaultStore
-      if ((globalThis as any).__JOTAI_DEFAULT_STORE__ !== defaultStore) {
-        console.warn(
-          'Detected multiple Jotai instances. It may cause unexpected behavior with the default store. https://github.com/pmndrs/jotai/discussions/2044',
-        )
+  return (): Store => {
+    if (!defaultStore) {
+      defaultStore = createStore()
+      if (import.meta.env?.MODE !== 'production') {
+        ;(globalThis as any).__JOTAI_DEFAULT_STORE__ ||= defaultStore
+        if ((globalThis as any).__JOTAI_DEFAULT_STORE__ !== defaultStore) {
+          console.warn(
+            'Detected multiple Jotai instances. It may cause unexpected behavior with the default store. https://github.com/pmndrs/jotai/discussions/2044',
+          )
+        }
       }
     }
+    return defaultStore
   }
-  return defaultStore
-}
+})()
