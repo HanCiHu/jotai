@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest'
-import { atom } from 'jotai/vanilla'
+import { atom, getDefaultStore } from 'jotai/vanilla'
 
 it('creates atoms', () => {
   // primitive atom
@@ -64,4 +64,14 @@ it('should let users mark atoms as private', () => {
       "write": [Function],
     }
   `)
+})
+
+it('defaultStore should be unique', () => {
+  expect((globalThis as any).__JOTAI_DEFAULT_STORE__).toBeUndefined()
+
+  const store1 = getDefaultStore()
+  const store2 = getDefaultStore()
+
+  expect(store1).toBe(store2)
+  expect(store1).toBe((globalThis as any).__JOTAI_DEFAULT_STORE__)
 })
