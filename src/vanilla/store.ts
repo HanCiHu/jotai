@@ -783,12 +783,34 @@ export const getDefaultStore = (() => {
     if (!defaultStore) {
       defaultStore = createStore()
       if (import.meta.env?.MODE !== 'production') {
-        ;(globalThis as any).__JOTAI_DEFAULT_STORE__ ||= defaultStore
-        if ((globalThis as any).__JOTAI_DEFAULT_STORE__ !== defaultStore) {
+        // first time
+        if (!(globalThis as any).__JOTAI_DEFAULT_STORE__) {
+          ;(globalThis as any).__JOTAI_DEFAULT_STORE__ = defaultStore
+        }
+        // hello
+        else if (
+          (globalThis as any).__JOTAI_DEFAULT_STORE__ !== defaultStore &&
+          !(globalThis as any).__JOTAI_HMR_RELOAD__
+        ) {
           console.warn(
             'Detected multiple Jotai instances. It may cause unexpected behavior with the default store. https://github.com/pmndrs/jotai/discussions/2044',
           )
         }
+        // check reload
+        else {
+          ;(globalThis as any).__JOTAI_HMR_RELOAD__ = true
+        }
+
+        // if (
+        //   (globalThis as any).__JOTAI_DEFAULT_STORE__ !== defaultStore &&
+        //   !(globalThis as any).__JOTAI_HMR_RELOAD__
+        // ) {
+        //   console.warn(
+        //     'Detected multiple Jotai instances. It may cause unexpected behavior with the default store. https://github.com/pmndrs/jotai/discussions/2044',
+        //   )
+        // } else {
+        //   ;(globalThis as any).__JOTAI_HMR_RELOAD__ = true
+        // }
       }
     }
     return defaultStore
